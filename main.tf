@@ -24,26 +24,80 @@ resource "local_file" "private_key" {
 resource "aws_security_group" "rancher_sg" {
   name        = "rancher-prime-security-group"
   description = "Allow inbound SSH and RKE2 communication"
-  
+  vpc_id      = var.vpc_id # <-- replace with your VPC ID
+
+  # SSH Web (public, adjust for your admin IPs)
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Open SSH to all IPs (adjust as needed)
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port   = 9345
-    to_port     = 9345
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kubernetes API server
+  ingress {
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Public if needed for kubectl from anywhere
+  }
+
+  # RKE2 node registration
+  ingress {
+    from_port   = 9345
+    to_port     = 9345
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"] # Restrict to your VPC/private network
+  }
+
+  # etcd client comms (servers only)
+  ingress {
+    from_port   = 2379
+    to_port     = 2381
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+  }
+
+  # Kubelet API (metrics server, monitoring)
+  ingress {
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.0.0/16"]
+  }
+
+  # VXLAN (Flannel) — only within cluster
+  ingress {
+    from_port   = 8472
+    to_port     = 8472
+    protocol    = "udp"
+    cidr_blocks = ["172.31.0.0/16"]
+  }
+
+  # Allow all outbound
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rancher-prime-security-group"
   }
 }
 
@@ -60,14 +114,6 @@ resource "aws_instance" "rancher_master" {
     volume_type = "gp3"
   }
 
-  user_data = <<-EOT
-    #!/bin/bash
-      "curl -sfL https://get.rke2.io | sh -",
-      "systemctl enable rke2-server.service",
-      "systemctl start rke2-server.service",
-      "sleep 20", # Allow some time for the master node to initialize
-      "cat /var/lib/rancher/rke2/server/node-token > /tmp/rke2_token.txt"
-    EOT
   tags = {
     Name = "rancher-prime-master"
   }
@@ -89,15 +135,6 @@ resource "aws_instance" "rancher_worker" {
     volume_size = 40    # Size in GB
     volume_type = "gp3"
   }
-
-   user_data = <<-EOT
-                    #!/bin/bash
-                    curl -sfL https://get.rke2.io | sh -
-                    systemctl enable rke2-agent.service
-                    systemctl start rke2-agent.service
-                    echo "RKE2_TOKEN=$(cat /tmp/rke2_token.txt)" >> /etc/rancher/rke2/config.yaml
-                    echo "RKE2_SERVER=https://$(aws_instance.rancher_master.public_ip):9345" >> /etc/rancher/rke2/config.yaml
-                EOT
 
   tags = {
     Name = "rancher-prime-worker"

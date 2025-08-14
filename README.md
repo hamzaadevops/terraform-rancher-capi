@@ -24,7 +24,7 @@ helm install rancher rancher-prime/rancher \
 
 route domain to our IP of master node
 
-
+echo https://rancher-prime.awssolutionsprovider.com/dashboard/?setup=$(kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}')
 
 
 
