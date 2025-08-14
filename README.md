@@ -13,8 +13,10 @@ helm upgrade --install cert-manager jetstack/cert-manager \
 
 
 helm repo add rancher-prime https://charts.rancher.com/server-charts/prime
+helm repo update
 helm install rancher rancher-prime/rancher \
   --namespace cattle-system \
+  --create-namespace \
   --set hostname=rancher-prime.awssolutionsprovider.com \
   --set bootstrapPassword=admin \
   --set ingress.tls.source=letsEncrypt \

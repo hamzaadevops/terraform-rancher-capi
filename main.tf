@@ -61,7 +61,7 @@ resource "aws_security_group" "rancher_sg" {
     from_port   = 9345
     to_port     = 9345
     protocol    = "tcp"
-    cidr_blocks = ["172.31.0.0/16"] # Restrict to your VPC/private network
+    cidr_blocks = ["0.0.0.0/0"] # Restrict to your VPC/private network
   }
 
   # etcd client comms (servers only)
@@ -142,6 +142,51 @@ resource "aws_instance" "rancher_worker" {
 
   depends_on = [
     aws_instance.rancher_master
+  ]
+}
+
+
+resource "aws_instance" "oss_rancher_master" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  key_name                    = aws_key_pair.rancher_key.key_name
+  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_size = 40    # Size in GB
+    volume_type = "gp3"
+  }
+
+  tags = {
+    Name = "rancher-oss-master"
+  }
+}
+
+data "aws_instance" "oss_rancher_master" {
+  instance_id = aws_instance.oss_rancher_master.id
+}
+
+resource "aws_instance" "oss_rancher_worker" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  key_name                    = aws_key_pair.rancher_key.key_name
+  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_size = 40    # Size in GB
+    volume_type = "gp3"
+  }
+
+  tags = {
+    Name = "rancher-oss-worker"
+  }
+
+  depends_on = [
+    aws_instance.oss_rancher_master
   ]
 }
 
