@@ -39,4 +39,8 @@ Storage	Rancher Longhorn	Rancher Longhorn Prime (Enhanced)
 Cluster Hardening	Manual Configuration	Automated Security Hardening
 Multi-Cloud Support	✅ Yes	✅ Yes (With Premium SLAs)
 
-Rancher Prime delivers the same core management capabilities and features as open-source Rancher. The difference is that Rancher Prime adds enterprise-grade support, security hardening, and compliance certifications (FIPS, DISA STIG, FedRAMP, CIS benchmarks), along with premium options like Longhorn Prime and advanced monitoring/DR. For most users, Rancher OSS is more than sufficient. But for organizations that need guaranteed 24/7 support, regulatory compliance, and enterprise governance, Rancher Prime is the right choice.
+Rancher Prime delivers the same core management capabilities and features as open-source Rancher. 
+
+The difference is that Rancher Prime adds enterprise-grade support, security hardening, and compliance certifications (FIPS, DISA STIG, FedRAMP, CIS benchmarks), along with premium options like Longhorn Prime and advanced monitoring/DR. 
+
+For most users, Rancher OSS is more than sufficient. But for organizations that need guaranteed 24/7 support, regulatory compliance, and enterprise governance, Rancher Prime is the right choice.
