@@ -53,7 +53,8 @@ helm install rancher rancher-prime/rancher \
   --set ingress.tls.source=letsEncrypt \
   --set letsEncrypt.environment=production \
   --set letsEncrypt.email=hamza@puffersoft.com \
-  --set letsEncrypt.ingress.class=nginx
+  --set letsEncrypt.ingress.class=nginx \
+  --version 2.11.3
 
 # Watch rollout
 watch kubectl get all -n cattle-system
@@ -78,14 +79,16 @@ helm upgrade --install cert-manager jetstack/cert-manager \
   --set crds.enabled=true
 
 # Install Rancher OSS
-kubectl create ns cattle-system
 helm upgrade --install rancher rancher-stable/rancher \
   --namespace cattle-system \
+  --create-namespace \
   --set hostname=rancher-oss.awssolutionsprovider.com \
   --set bootstrapPassword=admin \
   --set ingress.tls.source=letsEncrypt \
   --set letsEncrypt.environment=production \
-  --set letsEncrypt.email=mkhalid@puffersoft.com
+  --set letsEncrypt.email=mkhalid@puffersoft.com \
+  --set letsEncrypt.ingress.class=nginx \
+  --version 2.11.3
 
 # Watch rollout
 watch kubectl get all -n cattle-system

@@ -36,3 +36,5 @@ variable "rancher_prime_license" {
   type        = string
   default     = "25E90DB16ACB2636"
 }
+
+variable rancher_sg {}

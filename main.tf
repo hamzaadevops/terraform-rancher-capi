@@ -22,7 +22,7 @@ resource "local_file" "private_key" {
 }
 
 resource "aws_security_group" "rancher_sg" {
-  name        = "rancher-prime-security-group"
+  name        = var.rancher_sg
   description = "Allow inbound SSH and RKE2 communication"
   vpc_id      = var.vpc_id # <-- replace with your VPC ID
 

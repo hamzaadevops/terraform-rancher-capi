@@ -13,11 +13,6 @@ For Master Nodes:
     Scale Up time: Exaclty Same to become ready it takes about (80 seconds)
     Scale Down time: Exaclty Same (less than 30 sec)
 
-
-
-
-
-
 Choose Rancher Prime if:
 
 You are a large enterprise needing compliance, security, and premium support.
@@ -30,14 +25,14 @@ Final Verdict:
 
 
  Rancher vs. Rancher Prime: Key Differences
-Feature	Rancher (Open Source)	Rancher Prime (Enterprise)
-Pricing	✅ Free & Open Source	❌ Paid (Subscription Model)
-Support	Community Support	24/7 Enterprise Support (SLA)
-Security & Compliance	Basic Security	FIPS, DISA STIG, FedRAMP Compliance
-Data Backup & Recovery	Limited	Advanced Disaster Recovery
-Storage	Rancher Longhorn	Rancher Longhorn Prime (Enhanced)
-Cluster Hardening	Manual Configuration	Automated Security Hardening
-Multi-Cloud Support	✅ Yes	✅ Yes (With Premium SLAs)
+Feature	                       Rancher (Open Source)			Rancher Prime (Enterprise)
+Pricing	                       ✅ Free & Open Source			   ❌ Paid (Subscription Model)
+Support	                       Community Support				24/7 Enterprise Support (SLA)
+Security & Compliance		   Basic Security					FIPS, DISA STIG, FedRAMP Compliance
+Data Backup & Recovery		   Limited	   	   	   	   	   	   	Advanced Disaster Recovery
+Storage		   	   	   	   	   Rancher Longhorn		   	   	    Rancher Longhorn Prime (Enhanced)
+Cluster Hardening		   	   Manual Configuration		   	    Automated Security Hardening
+Multi-Cloud Support		   	   ✅ Yes		   	   	   	   	   ✅ Yes (With Premium SLAs)
 
 Rancher Prime delivers the same core management capabilities and features as open-source Rancher. 
 
