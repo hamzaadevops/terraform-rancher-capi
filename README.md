@@ -2,6 +2,17 @@
 
 This repository contains setup instructions for deploying Rancher Prime and Rancher OSS on Kubernetes using Helm, with TLS provided by cert-manager and Let's Encrypt.
 
+## Applying the code
+```bash
+  git clone git@github.hmz:hamzaadevops/terraform-rancher-capi.git
+  cd terraform-rancher-capi/
+  terraform init
+  terraform plan
+  terraform apply
+  terraform output capa_access_key_id
+  terraform output capa_secret_access_key
+```
+
 ## Network Ports to Allow in Security Group
 ### Public ingress to Rancher
 ```
@@ -83,6 +94,8 @@ apt install unzip
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
+
+aws configure # just get the credentials form terraform output
 ```
 
 ### Management Cluster
@@ -114,14 +127,44 @@ export AWS_SSH_KEY_NAME=rancher-prime-key              # existing EC2 keypair na
 export AWS_CONTROL_PLANE_MACHINE_TYPE=t3.medium # instance type for control plane
 export AWS_NODE_MACHINE_TYPE=t3.medium          # instance type for workers
 
+clusterawsadm ami list   --kubernetes-version=v1.30.8   --os=ubuntu-22.04   --region=ap-southeast-1
+
 # 👉 Note: AWS_SSH_KEY_NAME must match a keypair you already created in AWS (aws ec2 create-key-pair --key-name my-keypair).
 clusterctl generate cluster my-cluster \
   --infrastructure aws \
-  --kubernetes-version v1.30.0 \
+  --kubernetes-version v1.30.8 \
   --worker-machine-count=2 \
   --control-plane-machine-count=1 > my-cluster.yaml
 
 kubectl apply -f my-cluster.yaml
+```
+### clusterawsadm 
+
+ https://cluster-api-aws.sigs.k8s.io/quick-start#initialization-for-common-providers:~:text=Initialization%20for%20common%20providers
+
+```bash
+curl -L https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/download/v2.8.4/clusterawsadm-linux-amd64 -o clusterawsadm
+chmod +x clusterawsadm
+sudo mv clusterawsadm /usr/local/bin
+
+export AWS_REGION=us-east-1 # This is used to help encode your environment variables
+export AWS_ACCESS_KEY_ID=<your-access-key>
+export AWS_SECRET_ACCESS_KEY=<your-secret-access-key>
+export AWS_SESSION_TOKEN=<session-token> # If you are using Multi-Factor Auth.
+
+# The clusterawsadm utility takes the credentials that you set as environment
+# variables and uses them to create a CloudFormation stack in your AWS account
+# with the correct IAM resources.
+clusterawsadm bootstrap iam create-cloudformation-stack
+
+# Create the base64 encoded credentials using clusterawsadm.
+# This command uses your environment variables and encodes
+# them in a value to be stored in a Kubernetes Secret.
+export AWS_B64ENCODED_CREDENTIALS=$(clusterawsadm bootstrap credentials encode-as-profile)
+
+# Finally, initialize the management cluster
+clusterctl init --infrastructure aws
+
 ```
 
 ## DNS Setup

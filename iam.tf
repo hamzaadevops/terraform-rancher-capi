@@ -8,54 +8,7 @@ resource "aws_iam_policy" "capa_policy" {
   name        = var.capa_policy
   description = "Minimal IAM policy for Cluster API Provider AWS (CAPA)"
 
-  policy = <<EOT
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "autoscaling:*",
-        "cloudformation:*",
-        "ec2:*",
-        "elasticloadbalancing:*",
-        "iam:CreateServiceLinkedRole",
-        "iam:GetRole",
-        "iam:PassRole",
-        "iam:CreateInstanceProfile",
-        "iam:DeleteInstanceProfile",
-        "iam:AddRoleToInstanceProfile",
-        "iam:RemoveRoleFromInstanceProfile",
-        "iam:GetInstanceProfile",
-        "iam:ListInstanceProfiles",
-        "iam:ListInstanceProfilesForRole",
-        "iam:DeleteRole",
-        "iam:CreateRole",
-        "iam:AttachRolePolicy",
-        "iam:DetachRolePolicy",
-        "iam:GetPolicy",
-        "iam:GetPolicyVersion",
-        "iam:ListPolicyVersions",
-        "iam:ListAttachedRolePolicies",
-        "iam:DeleteRolePolicy",
-        "iam:PutRolePolicy",
-        "iam:DeleteRolePermissionsBoundary",
-        "iam:PutRolePermissionsBoundary",
-        "kms:DescribeKey",
-        "kms:ListAliases",
-        "kms:ListKeys",
-        "kms:ListResourceTags",
-        "kms:ListGrants",
-        "kms:GetKeyPolicy",
-        "kms:GetKeyRotationStatus",
-        "kms:CreateGrant",
-        "kms:RevokeGrant"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOT
+  policy = file("${path.module}/capa_policy.json")
 }
 
 # Attach Policy to User
