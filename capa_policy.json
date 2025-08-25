@@ -9,7 +9,8 @@
         "elasticloadbalancing:*",
         "autoscaling:*",
         "ssm:GetParameter",
-        "ssm:GetParameters"
+        "ssm:GetParameters",
+        "cloudformation:CreateStack"
       ],
       "Resource": "*"
     },
@@ -18,6 +19,7 @@
       "Effect": "Allow",
       "Action": [
         "iam:CreateRole",
+        "iam:CreatePolicy",
         "iam:GetRole",
         "iam:DeleteRole",
         "iam:AttachRolePolicy",
