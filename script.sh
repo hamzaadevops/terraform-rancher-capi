@@ -7,7 +7,8 @@ echo "TOKEN TO BE COPIED"
 cat /var/lib/rancher/rke2/server/node-token 
 snap install kubectl --classic
 snap install helm --classic
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+mkdir -p ~/.kube
+cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
 kubectl get nodes
 
 
@@ -16,6 +17,6 @@ curl -sfL https://get.rke2.io | sh -
 systemctl enable rke2-agent.service
 systemctl start rke2-agent.service
 sleep 10
-echo "server: https://18.141.161.6:9345" > /etc/rancher/rke2/config.yaml
-echo "token: K105d0098de9eb97fc7a906d02a5540df79f22432dff59a75dbc33f8162708bd360::server:12b00d9e56e39b7ea08c832b377d1fd6" >> /etc/rancher/rke2/config.yaml
+echo "server: https://13.212.224.187:9345" > /etc/rancher/rke2/config.yaml
+echo "token: K1070defbbe3c5a65423820445a461a6896b76b4249dbe88df72e716a9693db6a60::server:cb314d358673ccabf77a02efbc64c96a" >> /etc/rancher/rke2/config.yaml
 systemctl start rke2-agent.service

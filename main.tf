@@ -4,25 +4,25 @@ provider "aws" {
 }
 
 # Create a key pair
-resource "tls_private_key" "rancher_key" {
+resource "tls_private_key" "private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "aws_key_pair" "rancher_key" {
+resource "aws_key_pair" "private_key" {
   key_name   = var.key_name
-  public_key = tls_private_key.rancher_key.public_key_openssh
+  public_key = tls_private_key.private_key.public_key_openssh
 }
 
 # Save private key locally
 resource "local_file" "private_key" {
-  content  = tls_private_key.rancher_key.private_key_pem
+  content  = tls_private_key.private_key.private_key_pem
   filename = "${path.module}/${var.key_name}.pem"
   file_permission = "0600"
 }
 
-resource "aws_security_group" "rancher_sg" {
-  name        = var.rancher_sg
+resource "aws_security_group" "cluster_sg" {
+  name        = var.cluster_sg
   description = "Allow inbound SSH and RKE2 communication"
   vpc_id      = var.vpc_id # <-- replace with your VPC ID
 
@@ -97,15 +97,15 @@ resource "aws_security_group" "rancher_sg" {
   }
 
   tags = {
-    Name = "rancher-prime-security-group"
+    Name = "cluster_sg"
   }
 }
 
 resource "aws_instance" "rancher_master" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
-  key_name                    = aws_key_pair.rancher_key.key_name
-  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
+  key_name                    = aws_key_pair.private_key.key_name
+  vpc_security_group_ids      = [aws_security_group.cluster_sg.id]
   subnet_id                   = var.subnet_id
   associate_public_ip_address = true
 
@@ -115,19 +115,15 @@ resource "aws_instance" "rancher_master" {
   }
 
   tags = {
-    Name = "rancher-prime-master"
+    Name = "rancher_master"
   }
 }
 
-data "aws_instance" "rancher_master" {
-  instance_id = aws_instance.rancher_master.id
-}
-
-resource "aws_instance" "rancher_worker" {
+resource "aws_instance" "capa_master" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
-  key_name                    = aws_key_pair.rancher_key.key_name
-  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
+  key_name                    = aws_key_pair.private_key.key_name
+  vpc_security_group_ids      = [aws_security_group.cluster_sg.id]
   subnet_id                   = var.subnet_id
   associate_public_ip_address = true
 
@@ -137,56 +133,6 @@ resource "aws_instance" "rancher_worker" {
   }
 
   tags = {
-    Name = "rancher-prime-worker"
-  }
-
-  depends_on = [
-    aws_instance.rancher_master
-  ]
-}
-
-
-resource "aws_instance" "oss_rancher_master" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.rancher_key.key_name
-  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
-  subnet_id                   = var.subnet_id
-  associate_public_ip_address = true
-
-  root_block_device {
-    volume_size = 40    # Size in GB
-    volume_type = "gp3"
-  }
-
-  tags = {
-    Name = "rancher-oss-master"
+    Name = "capa_master"
   }
 }
-
-data "aws_instance" "oss_rancher_master" {
-  instance_id = aws_instance.oss_rancher_master.id
-}
-
-resource "aws_instance" "oss_rancher_worker" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.rancher_key.key_name
-  vpc_security_group_ids      = [aws_security_group.rancher_sg.id]
-  subnet_id                   = var.subnet_id
-  associate_public_ip_address = true
-
-  root_block_device {
-    volume_size = 40    # Size in GB
-    volume_type = "gp3"
-  }
-
-  tags = {
-    Name = "rancher-oss-worker"
-  }
-
-  depends_on = [
-    aws_instance.oss_rancher_master
-  ]
-}
-
