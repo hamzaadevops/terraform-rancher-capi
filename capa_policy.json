@@ -11,7 +11,12 @@
         "ssm:GetParameter",
         "ssm:GetParameters",
         "cloudformation:CreateStack",
-        "cloudformation:DeleteStack"
+        "cloudformation:DeleteStack",
+        "tag:GetResources",
+        "tag:GetTagKeys",
+        "tag:GetTagValues",
+        "tag:TagResources",
+        "tag:UntagResources"
       ],
       "Resource": "*"
     },

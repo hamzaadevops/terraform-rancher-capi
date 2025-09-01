@@ -8,3 +8,5 @@ variable "vpc_id" {}
 variable "cluster_sg" {}
 variable "capa_user" {}
 variable "capa_policy" {}
+variable "domain_name" {}
+variable "hosted_zone_id" {}
