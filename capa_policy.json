@@ -10,7 +10,8 @@
         "autoscaling:*",
         "ssm:GetParameter",
         "ssm:GetParameters",
-        "cloudformation:CreateStack"
+        "cloudformation:CreateStack",
+        "cloudformation:DeleteStack"
       ],
       "Resource": "*"
     },
@@ -22,6 +23,7 @@
         "iam:CreatePolicy",
         "iam:GetRole",
         "iam:DeleteRole",
+        "iam:DeletePolicy",
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
         "iam:PutRolePolicy",
