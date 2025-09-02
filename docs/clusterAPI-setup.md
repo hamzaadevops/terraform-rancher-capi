@@ -1,18 +1,3 @@
-## RKE2 Setup for Management Cluster
-Run the following using root user
-```bash
-curl -sfL https://get.rke2.io | sh -
-systemctl enable rke2-server.service
-systemctl start rke2-server.service
-echo "TOKEN TO BE COPIED" 
-cat /var/lib/rancher/rke2/server/node-token 
-snap install kubectl --classic
-snap install helm --classic
-mkdir -p ~/.kube
-cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
-kubectl get nodes
-```
-
 ## Cluster API Setup
 ### Basic Setup
 ```bash
@@ -106,13 +91,13 @@ clusterctl get kubeconfig my-cluster > my-cluster.kubeconfig
 ### Troubleshooting
 If the nodes are notReady, which is expected to be not ready please check the pods
 ```bash
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get node
+KUBECONFIG=my-cluster.kubeconfig kubectl get node
 NAME                                              STATUS     ROLES           AGE     VERSION
 ip-10-0-111-249.ap-southeast-1.compute.internal   NotReady   <none>          3m14s   v1.30.8
 ip-10-0-136-132.ap-southeast-1.compute.internal   NotReady   control-plane   4m6s    v1.30.8
 ip-10-0-74-10.ap-southeast-1.compute.internal     NotReady   <none>          3m12s   v1.30.8
 
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A
+KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A
 NAMESPACE     NAME                                                                      READY   STATUS    RESTARTS   AGE
 kube-system   coredns-55cb58b774-k6bs4                                                  0/1     Pending   0          4m5s
 kube-system   coredns-55cb58b774-tlmkp                                                  0/1     Pending   0          4m5s
@@ -138,9 +123,9 @@ kube-system   kube-scheduler-ip-10-0-136-132.ap-southeast-1.compute.internal    
 - Weave Net
 For example, to quickly install Calico:
 ```bash
-$ KUBECONFIG=my-cluster.kubeconfig kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
+KUBECONFIG=my-cluster.kubeconfig kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.28.0/manifests/calico.yaml
 
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A
+KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A
 NAMESPACE     NAME                                                                      READY   STATUS    RESTARTS   AGE
 kube-system   aws-cloud-controller-manager-9n779                                        1/1     Running   0          7m28s
 kube-system   calico-kube-controllers-564985c589-chcc7                                  1/1     Running   0          7m44s
@@ -166,16 +151,16 @@ kube-system   kube-scheduler-ip-10-0-136-132.ap-southeast-1.compute.internal    
 The clusters, nodes and control plane are managed as crds in cluster API
 ### Control Plane Node (kubeadmcontrolplane)
 ```bash
-$ kubectl get kubeadmcontrolplane 
+kubectl get kubeadmcontrolplane 
 NAME                       CLUSTER      INITIALIZED   API SERVER AVAILABLE   REPLICAS   READY   UPDATED   UNAVAILABLE   AGE   VERSION
 my-cluster-control-plane   my-cluster   true          true                   1          1       1         0             44m   v1.30.8
 
-$  kubectl scale kubeadmcontrolplane my-cluster-control-plane --replicas=3
+ kubectl scale kubeadmcontrolplane my-cluster-control-plane --replicas=3
 NAME                       CLUSTER      INITIALIZED   API SERVER AVAILABLE   REPLICAS   READY   UPDATED   UNAVAILABLE   AGE   VERSION
 my-cluster-control-plane   my-cluster   true          true                   2          1       2         1             51m   v1.30.8
 
 # After 40 seconds
-$ kubectl get kubeadmcontrolplane 
+kubectl get kubeadmcontrolplane 
 NAME                       CLUSTER      INITIALIZED   API SERVER AVAILABLE   REPLICAS   READY   UPDATED   UNAVAILABLE   AGE   VERSION
 my-cluster-control-plane   my-cluster   true          true                   3          2       3         1             52m   v1.30.8
 
@@ -186,19 +171,19 @@ my-cluster-control-plane   my-cluster   true          true                   3  
 ```
 ### Worker Node (machinedeployment)
 ```bash
-$ kubectl get machinedeployment
+kubectl get machinedeployment
 NAME              CLUSTER      REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE     AGE   VERSION
 my-cluster-md-0   my-cluster   2          2       2         0             Running   44m   v1.30.8
 
-$ kubectl scale machinedeployment my-cluster-md-0 --replicas=3
+kubectl scale machinedeployment my-cluster-md-0 --replicas=3
 machinedeployment.cluster.x-k8s.io/my-cluster-md-0 scaled
 
-$ kubectl get machinedeployment
+kubectl get machinedeployment
 NAME              CLUSTER      REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE       AGE   VERSION
 my-cluster-md-0   my-cluster   3          2       3         1             ScalingUp   47m   v1.30.8
 
 # After 40 seconds
-$ kubectl get machinedeployment
+kubectl get machinedeployment
 NAME              CLUSTER      REPLICAS   READY   UPDATED   UNAVAILABLE   PHASE     AGE   VERSION
 my-cluster-md-0   my-cluster   3          3       3         0             Running   47m   v1.30.8
 ```

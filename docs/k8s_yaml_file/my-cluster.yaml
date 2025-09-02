@@ -28,7 +28,7 @@ metadata:
 spec:
   controlPlaneLoadBalancer:
     healthCheckProtocol: HTTPS
-    loadBalancerType: nlb
+    loadBalancerType: classic
   region: ap-southeast-1
   sshKeyName: rancher-prime-key
 ---
@@ -62,7 +62,7 @@ spec:
       kind: AWSMachineTemplate
       name: my-cluster-control-plane
   replicas: 1
-  version: v1.30.0
+  version: v1.30.8
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
@@ -98,7 +98,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
         kind: AWSMachineTemplate
         name: my-cluster-md-0
-      version: v1.30.0
+      version: v1.30.8
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate

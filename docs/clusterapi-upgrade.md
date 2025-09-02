@@ -4,9 +4,12 @@
 export TARGET_OS="ubuntu-24.04"
 export REGION="ap-southeast-1"
 
-# List Ubuntu CAPA AMIs for your region/version
-clusterawsadm ami list --kubernetes-version  --os ubuntu 
-$ clusterawsadm ami list  --os=${TARGET_OS}   --region ${REGION}
+# List AMIs from the default AWS account where AMIs are stored.
+# Available os options: centos-7, ubuntu-24.04, ubuntu-22.04, amazon-2, flatcar-stable
+  # clusterawsadm ami list --kubernetes-version=v1.18.12 --os=ubuntu-20.04  --region=us-west-2
+# To list all supported AMIs in all supported Kubernetes versions, regions, and linux distributions:
+  # clusterawsadm ami list
+clusterawsadm ami list  --os=${TARGET_OS}   --region ${REGION}
 KUBERNETES VERSION   REGION           OS             NAME                                       AMI ID
 v1.32.0              ap-southeast-1   ubuntu-24.04   capa-ami-ubuntu-24.04-v1.32.0-1746714392   ami-06f54e4bde7e48fa1
 v1.31.0              ap-southeast-1   ubuntu-24.04   capa-ami-ubuntu-24.04-v1.31.0-1739348996   ami-0869f49009cd96a92
@@ -22,7 +25,7 @@ export WK_AMI="ami-0869f49009cd96a92"   # can be the same as CP_AMI if desired
 
 2) Create new AWSMachineTemplates (immutable best practice)
 ```yaml
-root@ip-172-31-14-6:~# cat AWSMachineTemplate.yml 
+cat > AWSMachineTemplate.yml 
 apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
 kind: AWSMachineTemplate
 metadata:
@@ -31,7 +34,7 @@ metadata:
 spec:
   template:
     spec:
-      iamInstanceProfile: nodes.cluster-api-provider-aws.sigs.k8s.io 
+      iamInstanceProfile: control-plane.cluster-api-provider-aws.sigs.k8s.io 
       instanceType: t3.medium 
       sshKeyName: rancher-prime-key
       ami:
@@ -59,11 +62,11 @@ spec:
 ```
 
 ```bash
-$ vi AWSMachineTemplate.yml
-$ kubectl apply -f AWSMachineTemplate.yml 
+vi AWSMachineTemplate.yml
+kubectl apply -f AWSMachineTemplate.yml 
 awsmachinetemplate.infrastructure.cluster.x-k8s.io/my-cluster-control-plane-template-v131 created
 awsmachinetemplate.infrastructure.cluster.x-k8s.io/my-cluster-worker-template-v131 created
-$ kubectl get AWSMachineTemplate
+kubectl get AWSMachineTemplate
 NAME                                     AGE
 my-cluster-control-plane                 94m
 my-cluster-control-plane-template-v131   11s
@@ -85,8 +88,8 @@ kubectl patch kubeadmcontrolplane my-cluster-control-plane --type merge -p "{
     }
   }
 }"
-# After about 96 seconds
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get node
+# After about 80 seconds
+KUBECONFIG=my-cluster.kubeconfig kubectl get node
 NAME                                              STATUS     ROLES           AGE   VERSION
 ip-10-0-136-132.ap-southeast-1.compute.internal   Ready      control-plane   92m   v1.30.8
 ip-10-0-202-102.ap-southeast-1.compute.internal   NotReady   control-plane   30s   v1.31.0
@@ -94,7 +97,7 @@ ip-10-0-64-103.ap-southeast-1.compute.internal    Ready      <none>          53m
 ip-10-0-74-10.ap-southeast-1.compute.internal     Ready      <none>          92m   v1.30.8
 
 # Wait until the new control plane node is Ready, then delete the old one
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get node
+KUBECONFIG=my-cluster.kubeconfig kubectl get node
 NAME                                              STATUS   ROLES           AGE     VERSION
 ip-10-0-202-102.ap-southeast-1.compute.internal   Ready    control-plane   4m17s   v1.31.0
 ip-10-0-64-103.ap-southeast-1.compute.internal    Ready    <none>          56m     v1.30.8
@@ -122,8 +125,8 @@ kubectl patch machinedeployment my-cluster-md-0 -n default --type merge -p "{
 ```bash
 kubectl get kubeadmcontrolplane my-cluster-control-plane
 kubectl get machinedeployment my-cluster-md-0 -n default -o wide
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get nodes -o wide
-$ KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A -o wide
+KUBECONFIG=my-cluster.kubeconfig kubectl get nodes -o wide
+KUBECONFIG=my-cluster.kubeconfig kubectl get pod -A -o wide
 ```
 # Quick rollback (if ever needed)
 - **Workers:** point the MD back to the previous AWSMachineTemplate and set spec.template.spec.version back to v1.30.8. This rolls back nodes.

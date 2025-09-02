@@ -23,7 +23,7 @@ sudo snap install kubectl --classic
 # For AMD64 / x86_64
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-amd64
 # For ARM64
-[ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-arm64
+# [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.30.0/kind-linux-arm64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
 # Confirm installation
@@ -41,4 +41,20 @@ kubectl cluster-info --context kind-kind
 
 # To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
+```
+
+# OR SETUP RKE2 CLUSTER
+## RKE2 Setup for Management Cluster
+Run the following using root user
+```bash
+curl -sfL https://get.rke2.io | sh -
+systemctl enable rke2-server.service
+systemctl start rke2-server.service
+echo "TOKEN TO BE COPIED" 
+cat /var/lib/rancher/rke2/server/node-token 
+snap install kubectl --classic
+snap install helm --classic
+mkdir -p ~/.kube
+cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+kubectl get nodes
 ```
