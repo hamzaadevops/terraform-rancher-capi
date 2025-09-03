@@ -101,24 +101,6 @@ resource "aws_security_group" "cluster_sg" {
   }
 }
 
-resource "aws_instance" "rancher_master" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.private_key.key_name
-  vpc_security_group_ids      = [aws_security_group.cluster_sg.id]
-  subnet_id                   = var.subnet_id
-  associate_public_ip_address = true
-
-  root_block_device {
-    volume_size = 40    # Size in GB
-    volume_type = "gp3"
-  }
-
-  tags = {
-    Name = "rancher_master"
-  }
-}
-
 resource "aws_instance" "capa_master" {
   ami                         = var.ami_id
   instance_type               = var.instance_type
@@ -134,6 +116,24 @@ resource "aws_instance" "capa_master" {
 
   tags = {
     Name = "capa_master"
+  }
+}
+
+resource "aws_instance" "rancher_master" {
+  ami                         = var.ami_id
+  instance_type               = var.instance_type
+  key_name                    = aws_key_pair.private_key.key_name
+  vpc_security_group_ids      = [aws_security_group.cluster_sg.id]
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = true
+
+  root_block_device {
+    volume_size = 40    # Size in GB
+    volume_type = "gp3"
+  }
+
+  tags = {
+    Name = "rancher_master"
   }
 }
 
